@@ -1,0 +1,44 @@
+---
+import { editionPath, formatDayLabel, groupByMonth } from '../lib/dates';
+import type { Edition } from '../lib/editions';
+
+interface Props {
+  editions: Edition[];
+  current: string | null;
+}
+
+const { editions, current } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const groups = groupByMonth(editions);
+---
+
+<nav aria-label="Ediciones">
+  <p class="side-kicker">Ediciones</p>
+  {editions.length === 0 && <p class="empty-nav">Todavía no hay ediciones.</p>}
+  {
+    groups.map((group) => (
+      <section class="month-group">
+        <p class="month-label">{group.label}</p>
+        <ul class="day-list">
+          {group.items.map((edition) => {
+            const active = edition.date === current;
+            return (
+              <li>
+                <a
+                  class="day-link"
+                  href={editionPath(edition.date, base)}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <time class="day-date" datetime={edition.date}>
+                    {formatDayLabel(edition.date)}
+                  </time>
+                  {edition.subtitle && <span class="day-sub">{edition.subtitle}</span>}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+</nav>
