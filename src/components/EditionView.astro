@@ -1,0 +1,74 @@
+---
+import { editionPath, formatDayLabel, neighbors } from '../lib/dates';
+import type { Edition } from '../lib/editions';
+
+interface Props {
+  edition: Edition;
+  editions: Edition[];
+  canonical: string;
+}
+
+const { edition, editions, canonical } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const { prev, next } = neighbors(
+  editions.map((item) => item.date),
+  edition.date,
+);
+const href = (date: string) => editionPath(date, base);
+const visible = canonical.replace(/^https?:\/\//, '');
+---
+
+<article class="edition">
+  <header class="edition-header">
+    <div class="dateline-row">
+      <p class="dateline">
+        {
+          edition.headerLines[0] ? (
+            <time datetime={edition.date} set:html={edition.headerLines[0]} />
+          ) : (
+            <time datetime={edition.date}>{edition.datelineText}</time>
+          )
+        }
+      </p>
+      <button class="tool-btn article-share" type="button" data-share data-url={canonical} aria-live="polite">
+        Compartir
+      </button>
+    </div>
+    {
+      edition.headerLines.length > 1 && (
+        <div class="edition-facts">
+          {edition.headerLines.slice(1).map((line) => (
+            <p set:html={line} />
+          ))}
+        </div>
+      )
+    }
+  </header>
+  <div class="edition-body" set:html={edition.html} />
+  <footer class="edition-footer">
+    <p class="endmark">Fin de la edición</p>
+    {
+      (prev || next) && (
+        <nav class="pager" aria-label="Otras ediciones">
+          {prev ? (
+            <a class="prev" href={href(prev)} rel="prev">
+              <span class="pager-kicker">Anterior</span>
+              <time datetime={prev}>{formatDayLabel(prev)}</time>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next ? (
+            <a class="next" href={href(next)} rel="next">
+              <span class="pager-kicker">Siguiente</span>
+              <time datetime={next}>{formatDayLabel(next)}</time>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )
+    }
+    <p class="permalink"><a href={canonical}>{visible}</a></p>
+  </footer>
+</article>

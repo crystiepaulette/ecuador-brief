@@ -1,0 +1,122 @@
+---
+import '@fontsource/fraunces/latin-600.css';
+import '@fontsource/fraunces/latin-600-italic.css';
+import '@fontsource/newsreader/latin-400.css';
+import '@fontsource/newsreader/latin-400-italic.css';
+import '@fontsource/newsreader/latin-600.css';
+import '@fontsource/newsreader/latin-600-italic.css';
+import '../styles/global.css';
+import EditionNav from '../components/EditionNav.astro';
+import { formatDayLabel } from '../lib/dates';
+import type { Edition } from '../lib/editions';
+
+interface Props {
+  editions: Edition[];
+  current: string | null;
+  title: string;
+  description: string;
+  canonical: string;
+  jsonLd?: string;
+  prevUrl?: string | null;
+  nextUrl?: string | null;
+}
+
+const { editions, current, title, description, canonical, jsonLd, prevUrl, nextUrl } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const origin = Astro.site ?? new URL('https://crystiepaulette.github.io');
+const image = new URL(`${base}icons/icon-512.png`, origin).href;
+const currentLabel = current ? formatDayLabel(current) : 'Ediciones';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {prevUrl && <link rel="prev" href={prevUrl} />}
+    {nextUrl && <link rel="next" href={nextUrl} />}
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Ecuador Brief" />
+    <link rel="manifest" href={`${base}manifest.webmanifest`} />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}favicon-32.png`} type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={`${base}icons/apple-touch-icon.png`} sizes="180x180" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="es_EC" />
+    <meta property="og:site_name" content="The Ecuador Brief" />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary" />
+    <style>
+      html { background: #fff; color: #141414; }
+      html[data-theme='dark'] { background: #141414; color: #f3f1ec; }
+      @media (prefers-color-scheme: dark) {
+        html:not([data-theme='light']) { background: #141414; color: #f3f1ec; }
+      }
+    </style>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('ecuador-brief-theme');
+          if (stored === 'light' || stored === 'dark') document.documentElement.setAttribute('data-theme', stored);
+          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', dark ? '#141414' : '#ffffff');
+        } catch (error) {}
+      })();
+    </script>
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="side-scroll">
+          <EditionNav editions={editions} current={current} />
+        </div>
+        <button class="tool-btn theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Cambiar tema de color">
+          Cambiar tema
+        </button>
+      </aside>
+      <div class="main-wrap">
+        <div class="mobile-bar">
+          <details class="day-select">
+            <summary>
+              <span class="summary-date">{currentLabel}</span>
+            </summary>
+            <div class="day-panel">
+              <EditionNav editions={editions} current={current} />
+            </div>
+          </details>
+          <button class="tool-btn" type="button" data-share data-url={canonical} aria-live="polite">Compartir</button>
+          <button class="tool-btn theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Cambiar tema de color">
+            Tema
+          </button>
+        </div>
+        <div class="sheet">
+          <header class="masthead">
+            <h1>THE ECUADOR BRIEF</h1>
+            <p class="rubric">Información · Contexto · Conocimiento</p>
+            <p class="lema">Entender Ecuador, más allá de los titulares.</p>
+            <div class="masthead-rule" role="presentation"></div>
+          </header>
+          <main id="contenido">
+            <slot />
+          </main>
+        </div>
+      </div>
+    </div>
+    <script>
+      import '../scripts/client.ts';
+    </script>
+  </body>
+</html>

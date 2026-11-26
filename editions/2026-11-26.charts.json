@@ -1,0 +1,14 @@
+[
+  {
+    "type": "bars",
+    "title": "Desbordamientos reportados por provincia",
+    "source": "Secretaría de Gestión de Riesgos vía Primicias, corte 19:00 del 25 nov 2026 (UTC−5)",
+    "after": "Desbordamientos en cuatro provincias",
+    "data": [
+      { "label": "Los Ríos", "value": 16 },
+      { "label": "Guayas", "value": 6 },
+      { "label": "Esmeraldas", "value": 2 },
+      { "label": "Manabí", "value": 1 }
+    ]
+  }
+]

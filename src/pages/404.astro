@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEditions } from '../lib/editions';
+
+const editions = getEditions();
+const base = import.meta.env.BASE_URL;
+const origin = Astro.site ?? new URL('https://crystiepaulette.github.io');
+const canonical = new URL(base, origin).href;
+---
+
+<Base
+  editions={editions}
+  current={null}
+  title="Página no encontrada — The Ecuador Brief"
+  description="Esta página no está en The Ecuador Brief."
+  canonical={canonical}
+>
+  <p class="empty">No encontramos esta página.</p>
+  <p class="empty"><a href={base}>Ir a la edición más reciente</a></p>
+</Base>

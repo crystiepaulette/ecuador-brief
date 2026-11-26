@@ -1,0 +1,28 @@
+{
+  "name": "ecuador-brief",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --host",
+    "preview:pages": "node scripts/serve-preview.mjs",
+    "test": "vitest run",
+    "icons": "node scripts/render-icons.mjs"
+  },
+  "dependencies": {
+    "@fontsource/fraunces": "^5.3.0",
+    "@fontsource/newsreader": "^5.3.0",
+    "astro": "^7.4.13",
+    "marked": "^18.3.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.2"
+  }
+}
