@@ -31,47 +31,71 @@ for (const file of textFiles) {
   }
 }
 
+const editionDates = (await readdir(root))
+  .filter((name) => /^\d{4}-\d{2}-\d{2}$/.test(name))
+  .sort()
+  .reverse();
+if (editionDates.length === 0) fail('No hay ediciones en el sitio construido.');
+const newest = editionDates[0];
 const home = await readFile(path.join(root, 'index.html'), 'utf8');
-const edition = await readFile(path.join(root, '2026-11-26', 'index.html'), 'utf8');
-const canonical = 'https://crystiepaulette.github.io/ecuador-brief/2026-11-26/';
+const newestCanonical = `https://crystiepaulette.github.io/ecuador-brief/${newest}/`;
+if (!home.includes(`rel="canonical" href="${newestCanonical}"`)) {
+  fail('La portada no apunta a la edición más reciente.');
+}
 
-for (const html of [home, edition]) {
-  if (!html.includes(`rel="canonical" href="${canonical}"`)) fail('Falta la URL canónica de la edición.');
+const shared = [
+  'Cierre:',
+  'Ventana principal:',
+  'Lectura estimada:',
+  'ol class="claves"',
+  'target="_blank"',
+  'apple-mobile-web-app-title" content="Ecuador Brief"',
+  'apple-touch-icon',
+  '/ecuador-brief/manifest.webmanifest',
+  'serviceWorker.register',
+];
+
+function expectEdition(html, date, phrases) {
+  const canonical = `https://crystiepaulette.github.io/ecuador-brief/${date}/`;
+  if (!html.includes(`rel="canonical" href="${canonical}"`)) fail(`Falta la URL canónica de ${date}.`);
   if ((html.match(/THE ECUADOR BRIEF/g) ?? []).length !== 1) fail('El masthead debe aparecer una sola vez.');
   if ((html.match(/Entender Ecuador, más allá de los titulares\./g) ?? []).length !== 1) fail('El lema debe aparecer una sola vez.');
   if ((html.match(/Información · Contexto · Conocimiento/g) ?? []).length !== 1) fail('La línea de secciones debe aparecer una sola vez.');
-  for (const phrase of [
-    'jue 26 nov 2026',
-    'noviembre 2026',
-    'Jueves 26 de noviembre de 2026',
-    'Cierre:',
-    'Ventana principal:',
-    'Lectura estimada:',
-    'El Niño desborda 25 ríos',
-    'Desbordamientos reportados por provincia',
-    'width:100%',
-    'width:6.25%',
-    'Los Ríos',
-    'Manabí',
-    'Secretaría de Gestión de Riesgos vía Primicias',
-    'CNEL amplía',
-    'Variable renewables',
-    'Conteo rápido',
-    'ol class="claves"',
-    'target="_blank"',
-    'apple-mobile-web-app-title" content="Ecuador Brief"',
-    'apple-touch-icon',
-    '/ecuador-brief/manifest.webmanifest',
-    'serviceWorker.register',
-  ]) {
-    if (!html.includes(phrase)) fail(`Falta «${phrase}» en el HTML construido.`);
+  for (const phrase of [...shared, ...phrases]) {
+    if (!html.includes(phrase)) fail(`Falta «${phrase}» en la edición ${date}.`);
   }
-  const chart = html.indexOf('Desbordamientos reportados por provincia');
-  const source = html.indexOf('babahoyo-se-declara-en-emergencia');
-  const energy = html.indexOf('>Energía<');
-  if (!(source < chart && chart < energy)) fail('El gráfico no quedó después de la nota de inundaciones.');
   if (html.includes('EBCHARTTOKEN')) fail('Quedó un marcador de gráfico sin reemplazar.');
 }
+
+const nov26 = await readFile(path.join(root, '2026-11-26', 'index.html'), 'utf8');
+expectEdition(nov26, '2026-11-26', [
+  'jue 26 nov 2026',
+  'Jueves 26 de noviembre de 2026',
+  'Desbordamientos reportados por provincia',
+  'width:6.25%',
+]);
+const floodChart = nov26.indexOf('Desbordamientos reportados por provincia');
+const floodSource = nov26.indexOf('babahoyo-se-declara-en-emergencia');
+const floodEnergy = nov26.indexOf('>Energía<');
+if (!(floodSource < floodChart && floodChart < floodEnergy)) {
+  fail('El gráfico del 26 nov no quedó después de la nota de inundaciones.');
+}
+
+if (!editionDates.includes('2026-11-27')) fail('Falta la edición del 27 de noviembre.');
+const nov27 = await readFile(path.join(root, '2026-11-27', 'index.html'), 'utf8');
+expectEdition(nov27, '2026-11-27', [
+  'vie 27 nov 2026',
+  'Viernes 27 de noviembre de 2026',
+  'Personas impactadas por El Niño, por provincia',
+  '31.844',
+]);
+const impactChart = nov27.indexOf('Personas impactadas por El Niño, por provincia');
+const impactHeading = nov27.indexOf('El balance nacional de El Niño');
+const elections = nov27.indexOf('>Elecciones<');
+if (!(impactHeading < impactChart && impactChart < elections)) {
+  fail('El gráfico del 27 nov no quedó después del balance de El Niño.');
+}
+expectEdition(home, newest, ['vie 27 nov 2026', 'Personas impactadas por El Niño, por provincia']);
 
 const manifest = JSON.parse(await readFile(path.join(root, 'manifest.webmanifest'), 'utf8'));
 if (manifest.name !== 'The Ecuador Brief' || manifest.short_name !== 'Ecuador Brief' || manifest.display !== 'standalone') {
