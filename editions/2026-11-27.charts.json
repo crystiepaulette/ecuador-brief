@@ -1,0 +1,19 @@
+[
+  {
+    "type": "bars",
+    "title": "Personas impactadas por El Niño, por provincia (acumulado desde el 29 de agosto de 2026)",
+    "source": "Secretaría Nacional de Gestión de Riesgos, citada por Primicias/EFE; corte al 26/11/2026",
+    "unit": "personas",
+    "after": "El balance nacional de El Niño",
+    "data": [
+      {"label": "Guayas", "value": 31844, "display": "31.844"},
+      {"label": "Esmeraldas", "value": 30246, "display": "30.246"},
+      {"label": "El Oro", "value": 17487, "display": "17.487"},
+      {"label": "Los Ríos", "value": 14748, "display": "14.748"},
+      {"label": "Galápagos", "value": 11381, "display": "11.381"},
+      {"label": "Santa Elena", "value": 6771, "display": "6.771"},
+      {"label": "Manabí", "value": 5999, "display": "5.999"},
+      {"label": "Bolívar", "value": 1101, "display": "1.101"}
+    ]
+  }
+]
