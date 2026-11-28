@@ -95,7 +95,33 @@ const elections = nov27.indexOf('>Elecciones<');
 if (!(impactHeading < impactChart && impactChart < elections)) {
   fail('El gráfico del 27 nov no quedó después del balance de El Niño.');
 }
-expectEdition(home, newest, ['vie 27 nov 2026', 'Personas impactadas por El Niño, por provincia']);
+
+if (!editionDates.includes('2026-11-28')) fail('Falta la edición del 28 de noviembre.');
+const nov28 = await readFile(path.join(root, '2026-11-28', 'index.html'), 'utf8');
+expectEdition(nov28, '2026-11-28', [
+  'sáb 28 nov 2026',
+  'Sábado 28 de noviembre de 2026',
+  'Recintos electorales reubicados por provincia',
+  'width:100%',
+  'width:75%',
+]);
+const recintosChart = nov28.indexOf('Recintos electorales reubicados por provincia');
+const recintosHeading = nov28.indexOf('Once recintos reubicados');
+const justicia = nov28.indexOf('>Justicia<');
+if (!(recintosHeading < recintosChart && recintosChart < justicia)) {
+  fail('El gráfico del 28 nov no quedó después de los recintos reubicados.');
+}
+
+const newestHtml =
+  newest === '2026-11-28'
+    ? nov28
+    : newest === '2026-11-27'
+      ? nov27
+      : newest === '2026-11-26'
+        ? nov26
+        : await readFile(path.join(root, newest, 'index.html'), 'utf8');
+const chartTitles = [...newestHtml.matchAll(/class="chart-title"[^>]*>([^<]+)</g)].map((match) => match[1]);
+expectEdition(home, newest, chartTitles);
 
 const manifest = JSON.parse(await readFile(path.join(root, 'manifest.webmanifest'), 'utf8'));
 if (manifest.name !== 'The Ecuador Brief' || manifest.short_name !== 'Ecuador Brief' || manifest.display !== 'standalone') {
