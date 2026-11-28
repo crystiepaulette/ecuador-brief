@@ -1,0 +1,16 @@
+[
+  {
+    "type": "bars",
+    "title": "Recintos electorales reubicados por provincia (corte del CNE: 27/11/2026, 18:30)",
+    "source": "Lista del CNE publicada por El Universo, 27/11/2026; conteo propio (Espejo asignado a Carchi)",
+    "unit": "recintos",
+    "after": "Once recintos reubicados",
+    "data": [
+      { "label": "Guayas", "value": 4 },
+      { "label": "Esmeraldas", "value": 3 },
+      { "label": "Galápagos", "value": 2 },
+      { "label": "El Oro", "value": 1 },
+      { "label": "Carchi", "value": 1 }
+    ]
+  }
+]
